@@ -1,0 +1,268 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vmName": {
+            "type": "String",
+            "defaultValue": "ArcBox-Client",
+            "metadata": {
+                "description": "The name of your Virtual Machine"
+            }
+        },
+        "windowsAdminUsername": {
+            "type": "String",
+            "defaultValue": "arcdemo",
+            "metadata": {
+                "description": "Username for the Virtual Machine"
+            }
+        },
+        "windowsAdminPassword": {
+            "type": "SecureString",
+            "minLength": 12,
+            "maxLength": 123,
+            "defaultValue": "ArcPassword123!!",
+            "metadata": {
+                "description": "Password for Windows account. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long"
+            }
+        },
+        "windowsOSVersion": {
+            "type": "String",
+            "defaultValue": "2022-datacenter-g2",
+            "metadata": {
+                "description": "The Windows version for the VM. This will pick a fully patched image of this given Windows version"
+            }
+        },
+        "location": {
+            "type": "String",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "Location for all resources"
+            }
+        },
+        "virtualNetworkName": {
+            "type": "String",
+            "defaultValue": "ArcBox-Vnet",
+            "metadata": {
+                "description": "Name of the VNET"
+            }
+        },
+        "subnetName": {
+            "type": "String",
+            "defaultValue": "ArcBox-Subnet",
+            "metadata": {
+                "description": "Name of the subnet in the virtual network"
+            }
+        },
+        "resourceTags": {
+            "type": "Object",
+            "defaultValue": {
+                "Project": "jumpstart_arcbox"
+            }
+        },
+        "spnClientId": {
+            "type": "String",
+            "metadata": {
+                "description": "Client id of the service principal"
+            }
+        },
+        "spnClientSecret": {
+            "type": "SecureString",
+            "metadata": {
+                "description": "Client secret of the service principal"
+            }
+        },
+        "spnAuthority": {
+            "type": "String",
+            "defaultValue": "https://login.microsoftonline.com"
+        },
+        "spnTenantId": {
+            "type": "String",
+            "metadata": {
+                "description": "Tenant id of the service principal"
+            }
+        },
+        "stagingStorageAccountName": {
+            "type": "String",
+            "metadata": {
+                "description": "Name for the staging storage account using to hold kubeconfig. This value is passed into the template as an output from mgmtStagingStorage.json"
+            }
+        },
+        "workspaceName": {
+            "type": "String",
+            "metadata": {
+                "description": "Name for the environment Azure Log Analytics workspace"
+            }
+        },
+        "templateBaseUrl": {
+            "type": "String",
+            "metadata": {
+                "description": "The base URL used for accessing templates and automation artifacts. Typically inherited from parent ARM template."
+            }
+        },
+        "flavor": {
+            "type": "String",
+            "metadata": {
+                "description": "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro'"
+            },
+            "allowedValues": [ "Full", "ITPro", "DevOps", "DataOps" ],
+            "defaultValue": "Full"
+        },
+        "deployBastion": {
+            "type": "bool",
+            "metadata": {
+                "description": "Choice to deploy Azure Bastion"
+            },
+            "defaultValue": false
+        },
+        "rdpPort": {
+            "type": "string",
+            "metadata": {
+                "description": "Override default RDP port 3389 using this parameter. Default is 3389. No changes will be made to the client VM."
+            },
+            "defaultValue": "3389"
+        },
+        "sshPort": {
+            "type": "string",
+            "metadata": {
+                "description": "Override default SSH port 22 using this parameter. Default is 22. No changes will be made to the client VM."
+            },
+            "defaultValue": "22"
+        }
+    },
+    "variables": {
+        "vmName": "[concat(parameters('vmName'))]",
+        "bastionName": "ArcBox-Bastion",
+        "publicIpAddressName": "[if(not(parameters('deployBastion')),concat(parameters('vmName'), '-PIP' ), concat(variables('bastionName'),'-PIP'))]",
+        "networkInterfaceName": "[concat(parameters('vmName'),'-NIC')]",
+        "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
+        "osDiskType": "Premium_LRS",
+        "PublicIPNoBastion": {
+            "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
+        }
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2022-01-01",
+            "name": "[variables('networkInterfaceName')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIpAddresses/', variables('publicIpAddressName'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "subnet": {
+                                "id": "[variables('subnetRef')]"
+                            },
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIpAddress": "[if(not(parameters('deployBastion')),variables('PublicIPNoBastion'),json('null'))]"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/publicIpAddresses",
+            "apiVersion": "2022-01-01",
+            "name": "[variables('publicIpAddressName')]",
+            "condition": "[not(parameters('deployBastion'))]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "publicIpAllocationMethod": "Static",
+                "publicIPAddressVersion": "IPv4",
+                "idleTimeoutInMinutes": 4
+            },
+            "sku": {
+                "name": "Basic",
+                "tier": "Regional"
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2022-03-01",
+            "name": "[variables('vmName')]",
+            "location": "[parameters('location')]",
+            "tags": "[parameters('resourceTags')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[if(equals(parameters('flavor'),'DevOps'),'Standard_B4ms',if(equals(parameters('flavor'),'DataOps'),'Standard_D8s_v4','Standard_D16s_v4'))]"
+                },
+                "storageProfile": {
+                    "osDisk": {
+                        "name": "[concat(variables('vmName'),'-OSDisk')]",
+                        "caching": "ReadWrite",
+                        "createOption": "fromImage",
+                        "managedDisk": {
+                            "storageAccountType": "[variables('osDiskType')]"
+                        },
+                        "diskSizeGB": 1024
+                    },
+                    "imageReference": {
+                        "publisher": "MicrosoftWindowsServer",
+                        "offer": "WindowsServer",
+                        "sku": "[parameters('windowsOSVersion')]",
+                        "version": "latest"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]"
+                        }
+                    ]
+                },
+                "osProfile": {
+                    "computerName": "[variables('vmName')]",
+                    "adminUsername": "[parameters('windowsAdminUsername')]",
+                    "adminPassword": "[parameters('windowsAdminPassword')]",
+                    "windowsConfiguration": {
+                        "provisionVMAgent": true,
+                        "enableAutomaticUpdates": false
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat(variables('vmName'),'/Bootstrap')]",
+            "apiVersion": "2022-03-01",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
+            ],
+            "tags": {
+                "displayName": "config-choco"
+            },
+            "properties": {
+                "publisher": "Microsoft.Compute",
+                "type": "CustomScriptExtension",
+                "typeHandlerVersion": "1.10",
+                "autoUpgradeMinorVersion": true,
+                "protectedSettings": {
+                    "fileUris": [
+                        "[uri(parameters('templateBaseUrl'), 'artifacts/Bootstrap.ps1')]"
+                    ],
+                    "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -adminUsername ', parameters('windowsAdminUsername'), ' -adminPassword ' , parameters('windowsAdminPassword'), ' -spnClientId ', parameters('spnClientId'), ' -spnClientSecret ', parameters('spnClientSecret'), ' -spnTenantId ', parameters('spnTenantId'), ' -spnAuthority ', parameters('spnAuthority'), ' -resourceGroup ', resourceGroup().name, ' -subscriptionId ', subscription().subscriptionId, ' -azureLocation ', parameters('location'), ' -stagingStorageAccountName ', parameters('stagingStorageAccountName'), ' -workspaceName ', parameters('workspaceName'), ' -templateBaseUrl ', parameters('templateBaseUrl'), ' -rdpPort ', parameters('rdpPort'), ' -sshPort ', parameters('sshPort'))]"
+                }
+            }
+        }
+    ],
+
+    "outputs": {
+        "adminUsername": {
+            "type": "String",
+            "value": "[parameters('windowsAdminUsername')]"
+        },
+        "publicIP": {
+            "condition": "[not(parameters('deployBastion'))]",
+            "type": "String",
+            "value": "[concat(reference(variables('publicIPAddressName')).IpAddress)]"
+        }
+    }
+}

@@ -1,0 +1,124 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "azureLocation": {
+            "type": "String",
+            "metadata": {
+                "description": "Location of your Azure resources"
+            }
+        },
+        "logAnalyticsWorkspace": {
+            "type": "String",
+            "metadata": {
+                "description": "Name of your log analytics workspace"
+            }
+        }
+    },
+    "variables": {
+        "policies": [
+            {
+                "name": "(ArcBox) Enable Azure Monitor for Hybrid VMs with AMA",
+                "definitionId": "/providers/Microsoft.Authorization/policySetDefinitions/59e9c3eb-d8df-473b-8059-23fd38ddd0f0",
+                "roleDefinition": [
+                    "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '92aaf0da-9dab-42b6-94a3-d43ce8d16293')]",
+                    "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', 'cd570a14-e51a-42ad-bac8-bafd67325302')]",
+                    "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '749f88d5-cbae-40b8-bcfc-e573ddc772fa')]"
+                ],
+                "parameters": {
+                    "logAnalyticsWorkspace": {
+                        "value": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('logAnalyticsWorkspace'))]"
+                    },
+                    "enableProcessesAndDependencies": {
+                        "value": true
+                    }
+                }
+            },
+            {
+                "name": "(ArcBox) Tag resources",
+                "definitionId": "/providers/Microsoft.Authorization/policyDefinitions/4f9dc7db-30c1-420c-b61a-e1d640128d26",
+                "roleDefinition": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]",
+                "parameters": {
+                    "tagName": {
+                        "value": "Project"
+                    },
+                    "tagValue": {
+                        "value": "jumpstart_arcbox"
+                    }
+                }
+            }
+        ]
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Authorization/policyAssignments",
+            "apiVersion": "2021-06-01",
+            "name": "[variables('policies')[copyIndex()].name]",
+            "location": "[parameters('azureLocation')]",
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "properties": {
+                "scope": "[subscriptionResourceId('Microsoft.Resources/resourceGroups', resourceGroup().name)]",
+                "policyDefinitionId": "[variables('policies')[copyIndex()].definitionId]",
+                "parameters": "[variables('policies')[copyIndex()].parameters]"
+            },
+            "copy": {
+                "name": "policyAssignmentCopy",
+                "count": "[length(variables('policies'))]"
+            }
+        },
+        {
+            "type": "Microsoft.Authorization/roleAssignments",
+            "apiVersion": "2020-10-01-preview",
+            "name": "[guid(variables('policies')[0].name, variables('policies')[0].roleDefinition[0], resourceGroup().id)]",
+            "dependsOn": [
+                "[variables('policies')[0].name]"
+            ],
+            "properties": {
+                "roleDefinitionId": "[variables('policies')[0].roleDefinition[0]]",
+                "principalId": "[reference(resourceId('Microsoft.Authorization/policyAssignments', variables('policies')[0].name), '2021-06-01', 'full').identity.principalId]",
+                "principalType": "ServicePrincipal"
+            }
+        },
+        {
+            "type": "Microsoft.Authorization/roleAssignments",
+            "apiVersion": "2020-10-01-preview",
+            "name": "[guid(variables('policies')[0].name, variables('policies')[0].roleDefinition[1], resourceGroup().id)]",
+            "dependsOn": [
+                "[variables('policies')[0].name]"
+            ],
+            "properties": {
+                "roleDefinitionId": "[variables('policies')[0].roleDefinition[1]]",
+                "principalId": "[reference(resourceId('Microsoft.Authorization/policyAssignments', variables('policies')[0].name), '2021-06-01', 'full').identity.principalId]",
+                "principalType": "ServicePrincipal"
+            }
+        },
+        {
+            "type": "Microsoft.Authorization/roleAssignments",
+            "apiVersion": "2020-10-01-preview",
+            "name": "[guid(variables('policies')[0].name, variables('policies')[0].roleDefinition[2], resourceGroup().id)]",
+            "dependsOn": [
+                "[variables('policies')[0].name]"
+            ],
+            "properties": {
+                "roleDefinitionId": "[variables('policies')[0].roleDefinition[2]]",
+                "principalId": "[reference(resourceId('Microsoft.Authorization/policyAssignments', variables('policies')[0].name), '2021-06-01', 'full').identity.principalId]",
+                "principalType": "ServicePrincipal"
+            }
+        },
+        {
+            "type": "Microsoft.Authorization/roleAssignments",
+            "apiVersion": "2020-10-01-preview",
+            "name": "[guid(variables('policies')[1].name, variables('policies')[1].roleDefinition, resourceGroup().id)]",
+            "dependsOn": [
+                "[variables('policies')[1].name]"
+            ],
+            "properties": {
+                "roleDefinitionId": "[variables('policies')[1].roleDefinition]",
+                "principalId": "[reference(resourceId('Microsoft.Authorization/policyAssignments', variables('policies')[1].name), '2021-06-01', 'full').identity.principalId]",
+                "principalType": "ServicePrincipal"
+            }
+        }
+    ]
+}

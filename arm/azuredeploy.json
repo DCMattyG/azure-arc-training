@@ -1,0 +1,173 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "spnClientId": {
+      "type": "String",
+      "metadata": {
+        "description": "Azure service principal client id"
+      }
+    },
+    "spnClientSecret": {
+      "type": "SecureString",
+      "metadata": {
+        "description": "Azure service principal client secret"
+      }
+    },
+    "spnTenantId": {
+      "type": "String",
+      "metadata": {
+        "description": "Azure AD tenant id for your service principal"
+      }
+    },
+    "windowsAdminUsername": {
+      "type": "String",
+      "metadata": {
+        "description": "Username for Windows account"
+      }
+    },
+    "windowsAdminPassword": {
+      "type": "SecureString",
+      "minLength": 12,
+      "maxLength": 123,
+      "metadata": {
+        "description": "Password for Windows account. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long"
+      }
+    },
+    "logAnalyticsWorkspaceName": {
+      "type": "String",
+      "metadata": {
+        "description": "Name for your log analytics workspace"
+      }
+    },
+    "githubAccount": {
+      "type": "String",
+      "metadata": {
+        "description": "Target GitHub account"
+      },
+      "defaultValue": "DCMattyG"
+    },
+    "githubBranch": {
+      "type": "String",
+      "metadata": {
+        "description": "Target GitHub branch"
+      },
+      "defaultValue": "main"
+    },
+    "deployBastion": {
+      "type": "bool",
+      "metadata": {
+        "description": "Choice to deploy Bastion to connect to the client VM"
+      },
+      "defaultValue": false
+    },
+    "rdpPort": {
+      "type": "string",
+      "metadata": {
+        "description": "Override default RDP port 3389 using this parameter. Default is 3389. No changes will be made to the client VM."
+      },
+      "defaultValue": "3389"
+    },
+    "sshPort": {
+      "type": "string",
+      "metadata": {
+        "description": "Override default SSH port 22 using this parameter. Default is 22. No changes will be made to the client VM."
+      },
+      "defaultValue": "22"
+    }
+  },
+  "variables": {
+    "templateBaseUrl": "[concat('https://raw.githubusercontent.com/', parameters('githubAccount'), '/azure-arc-training/', parameters('githubBranch'), '/azure_jumpstart_arcbox/')]",
+    "clientVmTemplateUrl": "[uri(variables('templateBaseUrl'), 'arm/clientVm/clientVm.json')]",
+    "mgmtTemplateUrl": "[uri(variables('templateBaseUrl'), 'arm/mgmt/mgmtArtifacts.json')]",
+    "mgmtStagingStorageUrl": "[uri(variables('templateBaseUrl'), 'arm/mgmt/mgmtStagingStorage.json')]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2021-04-01",
+      "name": "clientVmDeployment",
+      "dependsOn": [
+        "stagingStorageAccountDeployment"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('clientVmTemplateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "windowsAdminUsername": {
+            "value": "[parameters('windowsAdminUsername')]"
+          },
+          "windowsAdminPassword": {
+            "value": "[parameters('windowsAdminPassword')]"
+          },
+          "spnClientId": {
+            "value": "[parameters('spnClientId')]"
+          },
+          "spnClientSecret": {
+            "value": "[parameters('spnClientSecret')]"
+          },
+          "spnTenantId": {
+            "value": "[parameters('spnTenantId')]"
+          },
+          "workspaceName": {
+            "value": "[parameters('logAnalyticsWorkspaceName')]"
+          },
+          "stagingStorageAccountName": {
+            "value": "[reference('stagingStorageAccountDeployment').outputs.storageAccountName.value]"
+          },
+          "templateBaseUrl": {
+            "value": "[variables('templateBaseUrl')]"
+          },
+          "deployBastion": {
+            "value": "[parameters('deployBastion')]"
+          },
+          "rdpPort":{
+            "value": "[parameters('rdpPort')]"
+          },
+          "sshPort":{
+            "value": "[parameters('sshPort')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2021-04-01",
+      "name": "stagingStorageAccountDeployment",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('mgmtStagingStorageUrl')]",
+          "contentVersion": "1.0.0.0"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2021-04-01",
+      "name": "mgmtArtifactsAndPolicyDeployment",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('mgmtTemplateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "workspaceName": {
+            "value": "[parameters('logAnalyticsWorkspaceName')]"
+          },
+          "templateBaseUrl": {
+            "value": "[variables('templateBaseUrl')]"
+          },
+          "deployBastion": {
+            "value": "[parameters('deployBastion')]"
+          }
+        }
+      }
+    }
+  ],
+  "outputs": {}
+}
