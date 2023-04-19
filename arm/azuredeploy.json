@@ -77,7 +77,7 @@
     }
   },
   "variables": {
-    "templateBaseUrl": "[concat('https://raw.githubusercontent.com/', parameters('githubAccount'), '/azure-arc-training/', parameters('githubBranch'), '/azure_jumpstart_arcbox/')]",
+    "templateBaseUrl": "[concat('https://raw.githubusercontent.com/', parameters('githubAccount'), '/azure-arc-training/', parameters('githubBranch'), '/')]",
     "clientVmTemplateUrl": "[uri(variables('templateBaseUrl'), 'arm/clientVm/clientVm.json')]",
     "mgmtTemplateUrl": "[uri(variables('templateBaseUrl'), 'arm/mgmt/mgmtArtifacts.json')]",
     "mgmtStagingStorageUrl": "[uri(variables('templateBaseUrl'), 'arm/mgmt/mgmtStagingStorage.json')]"
