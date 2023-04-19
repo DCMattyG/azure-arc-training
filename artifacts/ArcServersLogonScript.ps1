@@ -238,16 +238,16 @@ Write-Header "Onboarding Arc-enabled Servers"
 # Onboarding the nested VMs as Azure Arc-enabled servers
 Write-Output "Onboarding the nested Windows VMs as Azure Arc-enabled servers"
 Invoke-Command -VMName $Win2k19vmName -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgent.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation } -Credential $winCreds
-Invoke-Command -VMName $Win2k22vmName -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgent.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation } -Credential $winCreds
+# Invoke-Command -VMName $Win2k22vmName -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgent.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation } -Credential $winCreds
 
 Write-Output "Onboarding the nested Linux VMs as an Azure Arc-enabled servers"
 $ubuntuSession = New-SSHSession -ComputerName $Ubuntu01VmIp -Credential $linCreds -Force -WarningAction SilentlyContinue
 $Command = "sudo sh /home/$nestedLinuxUsername/installArcAgentModifiedUbuntu.sh"
 $(Invoke-SSHCommand -SSHSession $ubuntuSession -Command $Command -Timeout 600 -WarningAction SilentlyContinue).Output
 
-$ubuntuSession = New-SSHSession -ComputerName $Ubuntu02VmIp -Credential $linCreds -Force -WarningAction SilentlyContinue
-$Command = "sudo sh /home/$nestedLinuxUsername/installArcAgentModifiedUbuntu.sh"
-$(Invoke-SSHCommand -SSHSession $ubuntuSession -Command $Command -Timeout 600 -WarningAction SilentlyContinue).Output
+# $ubuntuSession = New-SSHSession -ComputerName $Ubuntu02VmIp -Credential $linCreds -Force -WarningAction SilentlyContinue
+# $Command = "sudo sh /home/$nestedLinuxUsername/installArcAgentModifiedUbuntu.sh"
+# $(Invoke-SSHCommand -SSHSession $ubuntuSession -Command $Command -Timeout 600 -WarningAction SilentlyContinue).Output
 
 # Configure SSH on the nested Windows VMs
 Write-Output "Configuring SSH via Azure Arc agent on the nested Windows VMs"
@@ -291,13 +291,10 @@ namespace Win32{
 } 
 '@
 
-# Set wallpaper image based on the ArcBox Flavor deployed
-$DataServicesLogonScript = Get-WmiObject win32_process -filter 'name="powershell.exe"' | Select-Object CommandLine | ForEach-Object { $_ | Select-String "DataServicesLogonScript.ps1" }
-if (-not $DataServicesLogonScript) {
-    Write-Header "Changing Wallpaper"
-    $imgPath = "$Env:ArcBoxDir\wallpaper.png"
-    Add-Type $code
-    [Win32.Wallpaper]::SetWallpaper($imgPath)
-}
+# Set wallpaper image
+Write-Header "Changing Wallpaper"
+$imgPath = "$Env:ArcBoxDir\wallpaper.png"
+Add-Type $code
+[Win32.Wallpaper]::SetWallpaper($imgPath)
 
 Stop-Transcript

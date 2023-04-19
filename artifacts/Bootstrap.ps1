@@ -96,7 +96,7 @@ Write-Header "Fetching GitHub Artifacts"
 
 # All flavors
 Write-Host "Fetching Artifacts for All Flavors"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/img/arcbox_wallpaper.png") -OutFile $Env:ArcBoxDir\wallpaper.png
+Invoke-WebRequest ($templateBaseUrl + "img/arcbox_wallpaper.png") -OutFile $Env:ArcBoxDir\wallpaper.png
 Invoke-WebRequest ($templateBaseUrl + "artifacts/MonitorWorkbookLogonScript.ps1") -OutFile $Env:ArcBoxDir\MonitorWorkbookLogonScript.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/mgmtMonitorWorkbook.parameters.json") -OutFile $Env:ArcBoxDir\mgmtMonitorWorkbook.parameters.json
 Invoke-WebRequest ($templateBaseUrl + "artifacts/DeploymentStatus.ps1") -OutFile $Env:ArcBoxDir\DeploymentStatus.ps1
