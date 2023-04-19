@@ -76,31 +76,7 @@
     "bastionSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), variables('bastionSubnetName'))]",
     "bastionName": "ArcBox-Bastion",
     "bastionSubnetIpPrefix": "10.16.3.64/26",
-    "bastionPublicIpAddressName": "[concat(variables('bastionName'), '-PIP' )]",
-    "primarySubnet": [
-      {
-        "name": "[parameters('subnetName')]",
-        "properties": {
-          "addressPrefix": "[variables('subnetAddressPrefix')]",
-          "privateEndpointNetworkPolicies": "Enabled",
-          "privateLinkServiceNetworkPolicies": "Enabled",
-          "networkSecurityGroup": {
-            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
-          }
-        }
-      }
-    ],
-    "bastionSubnet": [
-      {
-        "name": "AzureBastionSubnet",
-        "properties": {
-          "addressPrefix": "[variables('bastionSubnetIpPrefix')]",
-          "networkSecurityGroup": {
-            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('bastionNetworkSecurityGroupName'))]"
-          }
-        }
-      }
-    ]
+    "bastionPublicIpAddressName": "[concat(variables('bastionName'), '-PIP' )]"
   },
   "resources": [
     {
@@ -119,8 +95,26 @@
           ]
         },
         "subnets": [
-          "[variables('primarySubnet')]",
-          "[variables('bastionSubnet')]"
+          {
+            "name": "[parameters('subnetName')]",
+            "properties": {
+              "addressPrefix": "[variables('subnetAddressPrefix')]",
+              "privateEndpointNetworkPolicies": "Enabled",
+              "privateLinkServiceNetworkPolicies": "Enabled",
+              "networkSecurityGroup": {
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
+              }
+            }
+          },
+          {
+            "name": "AzureBastionSubnet",
+            "properties": {
+              "addressPrefix": "[variables('bastionSubnetIpPrefix')]",
+              "networkSecurityGroup": {
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('bastionNetworkSecurityGroupName'))]"
+              }
+            }
+          }
         ]
       }
     },
