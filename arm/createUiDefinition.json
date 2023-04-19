@@ -17,23 +17,6 @@
                 "label": "ArcBox Config",
                 "elements": [
 					{
-						"name": "ipAddress",
-						"type": "Microsoft.Common.TextBox",
-						"label": "IP Address",
-						"defaultValue": "",
-						"toolTip": "The IPv4 address of your workstation. Can be found a http://www.icanhazip.com",
-						"multiLine": false,
-						"constraints": {
-							"required": true,
-							"validations": [
-								{
-									"regex": "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$",
-									"message": "Please enter a valid IPv4 address, for example: 17.18.19.20"
-								}
-							]
-						}
-					},
-					{
 						"name": "spnClientId",
 						"type": "Microsoft.Common.TextBox",
 						"label": "SPN Client ID",
@@ -130,14 +113,13 @@
             }
         ],
         "outputs": {
-			"myIpAddress": "[steps('arcboxConfig').ipAddress]",
             "spnClientId": "[steps('arcboxConfig').spnClientId]",
             "spnClientSecret": "[steps('arcboxConfig').spnClientSecret]",
             "spnTenantId": "[steps('arcboxConfig').spnTenantId]",
             "windowsAdminUsername": "[steps('arcboxConfig').winAdminUsername]",
 			"windowsAdminPassword": "[steps('arcboxConfig').winAdminPassword.password]",
 			"logAnalyticsWorkspaceName": "[steps('arcboxConfig').logAnalyticsWorkspaceName]",
-			"githubBranch": "arc-levelup-deploy"
+			"deployBastion": true
         }
     }
 }
