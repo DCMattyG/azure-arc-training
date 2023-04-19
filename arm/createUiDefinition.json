@@ -122,8 +122,8 @@
 			"deployBastion": true,
 			"githubAccount": "DCMattyG",
 			"githubBranch": "main",
-			"rdpPort": 3389,
-			"sshPort": 22
+			"rdpPort": "3389",
+			"sshPort": "22"
         }
     }
 }
