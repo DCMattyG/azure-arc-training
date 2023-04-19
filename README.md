@@ -1,6 +1,6 @@
 # Azure Arc-enabled servers LevelUp Training
 
-![LevelUp Deployment Diagram](levelup-diagram.png)
+![LevelUp Deployment Diagram](./docs/levelup-diagram.png)
 
 The following README will guide you on how to automatically deploy an ArcBox for use with the Azure Arc-enabled servers LevelUp training.
 
