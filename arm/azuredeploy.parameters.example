@@ -3,13 +3,13 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "spnClientId": {
-            "value": "<your service principal client id>"
+            "value": "<Service Principal ClientId>"
         },
         "spnClientSecret": {
-            "value": "<your service principal secret>"
+            "value": "<Service Principal Secret>"
         },
         "spnTenantId": {
-            "value": "<your spn tenant id>"
+            "value": "<Service Principal TenantId>"
         },
         "windowsAdminUsername": {
             "value": "arcdemo"
