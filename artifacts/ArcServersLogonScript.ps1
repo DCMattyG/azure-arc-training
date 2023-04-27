@@ -178,6 +178,7 @@ if ((Get-VM -Name $Ubuntu01vmName -ErrorAction SilentlyContinue).State -ne "Runn
     Remove-VM -Name $Ubuntu01vmName -Force -ErrorAction SilentlyContinue
     New-VM -Name $Ubuntu01vmName -MemoryStartupBytes 4GB -BootDevice VHD -VHDPath $Ubuntu01vmvhdPath -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName
     # Set-VMFirmware -VMName $Ubuntu01vmName -EnableSecureBoot On -SecureBootTemplate 'MicrosoftUEFICertificateAuthority'
+    Set-VMFirmware -VMName $Ubuntu01vmName -DisableSecureBoot
     Set-VMProcessor -VMName $Ubuntu01vmName -Count 1
     Set-VM -Name $Ubuntu01vmName -AutomaticStartAction Start -AutomaticStopAction ShutDown
 }
@@ -186,6 +187,7 @@ if ((Get-VM -Name $Ubuntu02vmName -ErrorAction SilentlyContinue).State -ne "Runn
     Remove-VM -Name $Ubuntu02vmName -Force -ErrorAction SilentlyContinue
     New-VM -Name $Ubuntu02vmName -MemoryStartupBytes 4GB -BootDevice VHD -VHDPath $Ubuntu02vmvhdPath -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName
     # Set-VMFirmware -VMName $Ubuntu02vmName -EnableSecureBoot On -SecureBootTemplate 'MicrosoftUEFICertificateAuthority'
+    Set-VMFirmware -VMName $Ubuntu02vmName -DisableSecureBoot
     Set-VMProcessor -VMName $Ubuntu02vmName -Count 1
     Set-VM -Name $Ubuntu02vmName -AutomaticStartAction Start -AutomaticStopAction ShutDown
 }
