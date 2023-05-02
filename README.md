@@ -12,7 +12,7 @@ However, **for demo purposes only**, the below guide will allow you to use and o
 
 ## Prerequisites
 
-* ArcBox LevelUp requires 16 DSv3-series vCPUs when deploying with default parameters such as VM series/size. Ensure you have sufficient vCPU quota available in your Azure subscription and the region where you plan to deploy ArcBox. You can use the below Az CLI command to check your vCPU utilization.
+* ArcBox LevelUp requires 16 DSv4-series vCPUs when deploying with default parameters such as VM series/size. Ensure you have sufficient vCPU quota available in your Azure subscription and the region where you plan to deploy ArcBox. You can use the below Az CLI command to check your vCPU utilization.
 
   ```shell
   az vm list-usage --location "<location>" --output table
@@ -20,7 +20,7 @@ However, **for demo purposes only**, the below guide will allow you to use and o
 
   ![Screenshot showing az vm list-usage](./docs/vcpu-availability.png)
 
-* [Install or update Azure CLI to version 2.25.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+* [Install or update Azure CLI to version 2.40.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version
@@ -73,8 +73,12 @@ ArcBox must be deployed to one of the following regions:
 * East US 2
 * West US 2
 * North Europe
+* West Europe
 * France Central
 * UK South
+* Australia East
+* Japan East
+* Korea Central
 * Southeast Asia
 
 ## Deploy the Template from the Azure Portal
