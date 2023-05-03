@@ -62,7 +62,7 @@ However, **for demo purposes only**, the below lab and guide will allow you to u
   }
   ```
 
-  > **Note: It is now mandatory to scope the SP to a specific [Azure subscription](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).**
+  > **Note: It is now mandatory to scope the SP to a specific [Azure subscription](https://learn.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest#az-ad-sp-create-for-rbac).**
 
 ## ArcBox Azure Region Compatibility
 
@@ -91,7 +91,7 @@ ArcBox must be deployed to one of the following regions:
 
     ![LevelUp Deployment Step 1](./docs/portal-deployment-01.png)
 
-3. Fill in your IP from [icanhazip.com](http://www.icanhazip.com), the corresponding fields from the Service Principal creation step above, and the Windows VM login credentials. Click **next**:
+3. Fill in the corresponding fields from the Service Principal creation step above and the Windows VM login credentials. Click **next**:
 
     ![LevelUp Deployment Step 2](./docs/portal-deployment-02.png)
 
@@ -101,7 +101,7 @@ ArcBox must be deployed to one of the following regions:
 
     ![LevelUp Deployment Step 3](./docs/portal-deployment-03.png)
 
-5. Once the deployment has finished, click **go to resource group***:
+5. Once the deployment has finished, click **go to resource group**:
 
     ![LevelUp Deployment Complete](./docs/deployment-complete.png)
 
@@ -121,11 +121,11 @@ ArcBox must be deployed to one of the following regions:
 
     ![LevelUp ArcBox Post-Deployment](./docs/post-deployment-scripts.png)
 
-10. Once the scripts have completed, you should have 2 Linux and 2 Windows VM's, which can be found in **Hyper-V Manager** on the desktop:
+10. Once the scripts have completed you should have 2 Linux and 2 Windows VMs, which can be found in **Hyper-V Manager** on the desktop:
 
     ![LevelUp ArcBox Hyper-V](./docs/hyper-v-manager.png)
 
-11. Back in the Resource Group view, you can see that two of the Hyper-V VM's (Ubuntu-01 & Win2K19) have already been onboarded to Azure Arc on your behalf:
+11. Back in the Resource Group view, you can see that two of the Hyper-V VMs (Ubuntu-01 & Win2K19) have already been onboarded to Azure Arc on your behalf:
 
     ![LevelUp ArcBox Arc Onboarded VMs](./docs/onboarded-vms.png)
 
