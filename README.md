@@ -41,13 +41,13 @@ However, **for demo purposes only**, the below guide will allow you to use and o
   ```shell
   az login
   az account set --subscription "<Subscription Id>"
-  az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
+  az ad sp create-for-rbac -n "<Unique SP Name>" --role "Owner" --scopes /subscriptions/<Subscription ID>
   ```
 
   For example:
 
   ```shell
-  az ad sp create-for-rbac -n "http://AzureArcLevelUp" --role contributor
+  az ad sp create-for-rbac -n "http://AzureArcLevelUp" --role "Owner" --scopes /subscriptions/31c4b5fc-27bf-3b85-7624-5e377c3f41af
   ```
 
   Output should look like this:
@@ -97,8 +97,6 @@ ArcBox must be deployed to one of the following regions:
 
     > Please make sure to select a **unique** value for the Log Analytics Workspace Name (e.g. it doesn't overlap any existing Log Analytics Workspace within the target Resource Group)
 
-    > Note: If [icanhazip.com](http://icanhazip.com) isn't working properly for you, you can also try [whatismyip.com](http://whatismyip.com) or [ipinfo.io/ip](http://ipinfo.io/ip)
-
 4. Review the deployment details, then click **create** to begin the deployment:
 
     ![LevelUp Deployment Step 3](./docs/portal-deployment-03.png)
@@ -111,13 +109,13 @@ ArcBox must be deployed to one of the following regions:
 
     ![LevelUp ArcBox VM](./docs/arcbox-vm.png)
 
-7. Copy the **Public IP** by clicking the copy icon to the right of it:
+7. Click on **Bastion** under **Operations** in the left-hand menu:
 
-    ![LevelUp ArcBox Public IP](./docs/copy-public-ip.png)
+    ![LevelUp ArcBox Bastion](./docs/select-bastion.png)
 
-8. Paste the copied **Public IP** into a Remote Desktop window, and click **Connect**:
+8. Enter the **Username** and **Password** you set during the deployment (above) and click **Connect**:
 
-    ![LevelUp ArcBox RDP](./docs/remote-desktop.png)
+    ![LevelUp ArcBox RDP](./docs/bastion-connect.png)
 
 9. Watch and wait for the post-deployment automation script to finish:
 
@@ -127,7 +125,7 @@ ArcBox must be deployed to one of the following regions:
 
     ![LevelUp ArcBox Hyper-V](./docs/hyper-v-manager.png)
 
-11. Back in the Resource Group view, you can see that two of the Hyper-V VM's (CentOS & Win2K19) have already been onboarded to Azure Arc on your behalf:
+11. Back in the Resource Group view, you can see that two of the Hyper-V VM's (Ubuntu-01 & Win2K19) have already been onboarded to Azure Arc on your behalf:
 
     ![LevelUp ArcBox Arc Onboarded VMs](./docs/onboarded-vms.png)
 
