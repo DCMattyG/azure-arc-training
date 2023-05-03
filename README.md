@@ -4,9 +4,9 @@
 
 The following README will guide you on how to automatically deploy an ArcBox for use with the Azure Arc-enabled servers LevelUp training.
 
-Azure VMs are leveraging the [Azure Instance Metadata Service (IMDS)](https://docs.microsoft.com/en-us/azure/virtual-machines/windows/instance-metadata-service) by default. By projecting an Azure VM as an Azure Arc-enabled server, a "conflict" is created which will not allow for the Azure Arc server resources to be represented as one when the IMDS is being used and instead, the Azure Arc server will still "act" as a native Azure VM.
+Azure VMs leverage the [Azure Instance Metadata Service (IMDS)](https://docs.microsoft.com/en-us/azure/virtual-machines/windows/instance-metadata-service) to communicate with Azure,and is also how Azure knows that a particular VM is running inside Azure (or even running as anested VM within an Azure VM). Onboarding such Azure VMs to Arc is not allowed and the process will fail.
 
-However, **for demo purposes only**, the below guide will allow you to use and onboard VMs running on an Azure VM to Azure Arc and by doing so, you will be able to simulate a server which is deployed outside of Azure (i.e "on-premises" or in other cloud platforms)
+However, **for demo purposes only**, the below lab and guide will allow you to use and onboard VMs running on Hyper-V within an Azure VM to Azure Arc by blocking communication to IMDS. This will allow us to simulate servers which are deployed outside of Azure (i.e "on-premises" or in other cloud platforms)
 
 > **Note: It is not expected for an Azure VM to be projected as an Azure Arc-enabled server. The below scenario is unsupported and should ONLY be used for demo and testing purposes.**
 
@@ -41,13 +41,13 @@ However, **for demo purposes only**, the below guide will allow you to use and o
   ```shell
   az login
   az account set --subscription "<Subscription Id>"
-  az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
+  az ad sp create-for-rbac -n "<Unique SP Name>" --role "Owner" --scopes /subscriptions/<Subscription ID>
   ```
 
   For example:
 
   ```shell
-  az ad sp create-for-rbac -n "http://AzureArcLevelUp" --role contributor
+  az ad sp create-for-rbac -n "http://AzureArcLevelUp" --role "Owner" --scopes /subscriptions/31c4b5fc-27bf-3b85-7624-5e377c3f41af
   ```
 
   Output should look like this:
@@ -62,7 +62,7 @@ However, **for demo purposes only**, the below guide will allow you to use and o
   }
   ```
 
-  > **Note: It is optional, but highly recommended, to scope the SP to a specific [Azure subscription](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).**
+  > **Note: It is now mandatory to scope the SP to a specific [Azure subscription](https://learn.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest#az-ad-sp-create-for-rbac).**
 
 ## ArcBox Azure Region Compatibility
 
@@ -91,19 +91,17 @@ ArcBox must be deployed to one of the following regions:
 
     ![LevelUp Deployment Step 1](./docs/portal-deployment-01.png)
 
-3. Fill in your IP from [icanhazip.com](http://www.icanhazip.com), the corresponding fields from the Service Principal creation step above, and the Windows VM login credentials. Click **next**:
+3. Fill in the corresponding fields from the Service Principal creation step above and the Windows VM login credentials. Click **next**:
 
     ![LevelUp Deployment Step 2](./docs/portal-deployment-02.png)
 
     > Please make sure to select a **unique** value for the Log Analytics Workspace Name (e.g. it doesn't overlap any existing Log Analytics Workspace within the target Resource Group)
 
-    > Note: If [icanhazip.com](http://icanhazip.com) isn't working properly for you, you can also try [whatismyip.com](http://whatismyip.com) or [ipinfo.io/ip](http://ipinfo.io/ip)
-
 4. Review the deployment details, then click **create** to begin the deployment:
 
     ![LevelUp Deployment Step 3](./docs/portal-deployment-03.png)
 
-5. Once the deployment has finished, click **go to resource group***:
+5. Once the deployment has finished, click **go to resource group**:
 
     ![LevelUp Deployment Complete](./docs/deployment-complete.png)
 
@@ -111,23 +109,23 @@ ArcBox must be deployed to one of the following regions:
 
     ![LevelUp ArcBox VM](./docs/arcbox-vm.png)
 
-7. Copy the **Public IP** by clicking the copy icon to the right of it:
+7. Click on **Bastion** under **Operations** in the left-hand menu:
 
-    ![LevelUp ArcBox Public IP](./docs/copy-public-ip.png)
+    ![LevelUp ArcBox Bastion](./docs/select-bastion.png)
 
-8. Paste the copied **Public IP** into a Remote Desktop window, and click **Connect**:
+8. Enter the **Username** and **Password** you set during the deployment (above) and click **Connect**:
 
-    ![LevelUp ArcBox RDP](./docs/remote-desktop.png)
+    ![LevelUp ArcBox RDP](./docs/bastion-connect.png)
 
 9. Watch and wait for the post-deployment automation script to finish:
 
     ![LevelUp ArcBox Post-Deployment](./docs/post-deployment-scripts.png)
 
-10. Once the scripts have completed, you should have 2 Linux and 2 Windows VM's, which can be found in **Hyper-V Manager** on the desktop:
+10. Once the scripts have completed you should have 2 Linux and 2 Windows VMs, which can be found in **Hyper-V Manager** on the desktop:
 
     ![LevelUp ArcBox Hyper-V](./docs/hyper-v-manager.png)
 
-11. Back in the Resource Group view, you can see that two of the Hyper-V VM's (CentOS & Win2K19) have already been onboarded to Azure Arc on your behalf:
+11. Back in the Resource Group view, you can see that two of the Hyper-V VMs (Ubuntu-01 & Win2K19) have already been onboarded to Azure Arc on your behalf:
 
     ![LevelUp ArcBox Arc Onboarded VMs](./docs/onboarded-vms.png)
 
