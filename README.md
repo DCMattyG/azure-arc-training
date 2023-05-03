@@ -62,7 +62,7 @@ However, **for demo purposes only**, the below lab and guide will allow you to u
   }
   ```
 
-  > **Note: It is optional, but highly recommended, to scope the SP to a specific [Azure subscription](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).**
+  > **Note: It is now mandatory to scope the SP to a specific [Azure subscription](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).**
 
 ## ArcBox Azure Region Compatibility
 
