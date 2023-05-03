@@ -4,9 +4,9 @@
 
 The following README will guide you on how to automatically deploy an ArcBox for use with the Azure Arc-enabled servers LevelUp training.
 
-Azure VMs are leveraging the [Azure Instance Metadata Service (IMDS)](https://docs.microsoft.com/en-us/azure/virtual-machines/windows/instance-metadata-service) by default. By projecting an Azure VM as an Azure Arc-enabled server, a "conflict" is created which will not allow for the Azure Arc server resources to be represented as one when the IMDS is being used and instead, the Azure Arc server will still "act" as a native Azure VM.
+Azure VMs leverage the [Azure Instance Metadata Service (IMDS)](https://docs.microsoft.com/en-us/azure/virtual-machines/windows/instance-metadata-service) to communicate with Azure,and is also how Azure knows that a particular VM is running inside Azure (or even running as anested VM within an Azure VM). Onboarding such Azure VMs to Arc is not allowed and the process will fail.
 
-However, **for demo purposes only**, the below guide will allow you to use and onboard VMs running on an Azure VM to Azure Arc and by doing so, you will be able to simulate a server which is deployed outside of Azure (i.e "on-premises" or in other cloud platforms)
+However, **for demo purposes only**, the below lab and guide will allow you to use and onboard VMs running on Hyper-V within an Azure VM to Azure Arc by blocking communication to IMDS. This will allow us to simulate servers which are deployed outside of Azure (i.e "on-premises" or in other cloud platforms)
 
 > **Note: It is not expected for an Azure VM to be projected as an Azure Arc-enabled server. The below scenario is unsupported and should ONLY be used for demo and testing purposes.**
 
