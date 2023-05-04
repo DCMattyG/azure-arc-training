@@ -47,7 +47,7 @@ However, **for demo purposes only**, the below lab and guide will allow you to u
   For example:
 
   ```shell
-  az ad sp create-for-rbac -n "http://AzureArcLevelUp" --role "Owner" --scopes /subscriptions/31c4b5fc-27bf-3b85-7624-5e377c3f41af
+  az ad sp create-for-rbac -n "http://AzureArcLevelUp" --role "Owner" --scopes /subscriptions/31c4b5fc-xxxx-xxxx-xxxx-5e377c3f41af
   ```
 
   Output should look like this:
@@ -62,7 +62,7 @@ However, **for demo purposes only**, the below lab and guide will allow you to u
   }
   ```
 
-  > **Note: It is now mandatory to scope the SP to a specific [Azure subscription](https://learn.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest#az-ad-sp-create-for-rbac).**
+  > **Note: It is now mandatory to scope the SP to a specific [Azure subscription](https://learn.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest#az-ad-sp-create-for-rbac). Please save this output as you will need it throughout the lab.**
 
 ## ArcBox Azure Region Compatibility
 
