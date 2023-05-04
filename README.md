@@ -62,9 +62,7 @@ However, **for demo purposes only**, the below lab and guide will allow you to u
   }
   ```
 
-  > **Note: It is now mandatory to scope the SP to a specific [Azure subscription](https://learn.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest#az-ad-sp-create-for-rbac).**
-  
-  > **Note: Please save this information, you will need it throughout the lab.**
+  > **Note: It is now mandatory to scope the SP to a specific [Azure subscription](https://learn.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest#az-ad-sp-create-for-rbac). Please save this output as you will need it throughout the lab.**
 
 ## ArcBox Azure Region Compatibility
 
